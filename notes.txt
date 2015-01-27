@@ -1,0 +1,5 @@
+Flush iptables
+sudo iptables -F
+
+Run server with debug
+/manage.py runserver 0.0.0.0:8080
