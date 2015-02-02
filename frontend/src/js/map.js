@@ -118,9 +118,14 @@ if (!window.console) console = {log: function() {}};
             if( $('#branchSelect').prop('checked') ){
                 toggleBranches(true);
             }
+            console.log("MOVEEND");
         });
 
-        map.on('moveend', _.debounce(init, 500) );
+        map.on('moveend', _.debounce(init, 2500) );
+
+        map.on('movestart', function(e){
+          console.log("movestart");
+        });
 
         // When the page loads, update the print link, and update it whenever the hash changes
         updatePrintLink();
@@ -140,8 +145,10 @@ if (!window.console) console = {log: function() {}};
     
     // Go get the tract centroids and supporting data, THEN build a data object (uses jQuery Deferreds)
     function init(){
+        console.log("init fired");
+        var boundParams = getBoundParams();
         blockStuff();
-        $.when( getTractsInBounds( getBoundParams() ), getTractData( getBoundParams(), getActionTaken( $('#action-taken-selector option:selected').val() ))).done( function(data1, data2){
+        $.when( getTractsInBounds( boundParams ), getTractData( boundParams, getActionTaken( $('#action-taken-selector option:selected').val() ))).done( function(data1, data2){
             // Get the information about the currently selected layer so we can pass bubble styles to redraw
             var hashInfo = getHashParams(),
                 layerInfo = getLayerType(hashInfo.category.values);
