@@ -13,6 +13,7 @@ if (!window.console) console = {log: function() {}};
         $( window ).resize(function() {
             setMapHeight();
         });
+        '<img src="/static/basestyle/img/loading_white.gif" height="75px"> <h6>Loading HMDA Data</h6>',
 
         // When minority changes, redraw the circles with appropriate styles
         $('#category-selector').on('change', function(e) {
@@ -121,10 +122,13 @@ if (!window.console) console = {log: function() {}};
             console.log("MOVEEND");
         });
 
-        map.on('moveend', _.debounce(init, 2500) );
+        map.on('moveend', init); 
 
         map.on('movestart', function(e){
-          console.log("movestart");
+            if(lastXHR&&lastXHR.readyState !== 4){
+              lastXHR.abort();
+              hideLoadingUI();
+            }
         });
 
         // When the page loads, update the print link, and update it whenever the hash changes
@@ -147,7 +151,6 @@ if (!window.console) console = {log: function() {}};
     function init(){
         console.log("init fired");
         var boundParams = getBoundParams();
-        blockStuff();
         $.when( getTractsInBounds( boundParams ), getTractData( boundParams, getActionTaken( $('#action-taken-selector option:selected').val() ))).done( function(data1, data2){
             // Get the information about the currently selected layer so we can pass bubble styles to redraw
             var hashInfo = getHashParams(),
@@ -163,9 +166,6 @@ if (!window.console) console = {log: function() {}};
             // Redraw the circles using the created tract object AND the layer bubble type
             redrawCircles(dataStore.tracts, layerInfo.type );
             
-            // Unblock the user interface (remove gradient)
-            $.unblockUI();
-            isUIBlocked = false;
         });
     }
 
@@ -245,40 +245,12 @@ if (!window.console) console = {log: function() {}};
 
     }     
 
-    // Uses jQuery BlockUI plugin to block UI on data loading
-    function blockStuff(){
-        if( isUIBlocked === true ){
-            return false;
-        } else {
-            isUIBlocked = true;
-            $.blockUI(
-                {   css: { 
-                        border: 'none', 
-                        padding: '15px', 
-                        backgroundColor: '#000', 
-                        '-webkit-border-radius': '10px', 
-                        '-moz-border-radius': '10px', 
-                        opacity: 0.5, 
-                        color: '#fff' 
-                    },
-                    message: '<img src="/static/basestyle/img/loading_white.gif" height="75px"> <h6>Loading HMDA Data</h6>',
-                    overlayCSS:  { 
-                        backgroundColor: '#000', 
-                        opacity:         0.0, 
-                        cursor:          'wait' 
-                    }
-                }
-            );
-        }
-        
-    }
 
     /* 
         ---- GET DATA SCRIPTS ----
     */    
 
     var rawGeo, rawLar, rawMinority, rawData, 
-    isUIBlocked = false,
     dataStore = {};
     dataStore.tracts = {};
     
