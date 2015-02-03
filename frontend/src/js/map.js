@@ -13,8 +13,9 @@ if (!window.console) console = {log: function() {}};
         $( window ).resize(function() {
             setMapHeight();
         });
-        '<img src="/static/basestyle/img/loading_white.gif" height="75px"> <h6>Loading HMDA Data</h6>',
 
+        
+       
         // When minority changes, redraw the circles with appropriate styles
         $('#category-selector').on('change', function(e) {
             var val = $('#category-selector').val();
@@ -142,14 +143,41 @@ if (!window.console) console = {log: function() {}};
             updateCensusLink();
         });
 
+        //Initialize dataloading window
+        msgToggle.init();
+
         //Let the application do its thing 
         init();
         
     });
-    
+
+    //Setup data loading notification window 
+    var msgToggle = function(){
+       var msgNode;
+       
+       function init(){
+          msgNode = $('<div class="loadingMsg hiddenMsg"><img src="/static/basestyle/img/loading_white.gif" height="75px"> <h6>Loading HMDA Data</h6></div>').appendTo($('body'));
+       }
+
+       function show(){
+          return msgNode.removeClass('hiddenMsg');
+       }
+
+       function hide(){
+          return msgNode.addClass('hiddenMsg');
+       }
+
+       return {
+          init:init,
+          show:show,
+          hide:hide
+       }
+    }();
     // Go get the tract centroids and supporting data, THEN build a data object (uses jQuery Deferreds)
     function init(){
         console.log("init fired");
+        console.log(msgToggle);
+        msgToggle.show();
         var boundParams = getBoundParams();
         $.when( getTractsInBounds( boundParams ), getTractData( boundParams, getActionTaken( $('#action-taken-selector option:selected').val() ))).done( function(data1, data2){
             // Get the information about the currently selected layer so we can pass bubble styles to redraw
@@ -165,9 +193,10 @@ if (!window.console) console = {log: function() {}};
 
             // Redraw the circles using the created tract object AND the layer bubble type
             redrawCircles(dataStore.tracts, layerInfo.type );
-            
+            msgToggle.hide(); 
         });
     }
+     
 
     // Supporting function to adjust the leaflet map to the height of the window
     function setMapHeight() {
@@ -250,7 +279,7 @@ if (!window.console) console = {log: function() {}};
         ---- GET DATA SCRIPTS ----
     */    
 
-    var rawGeo, rawLar, rawMinority, rawData, 
+    var rawGeo, rawLar, rawMinority, rawData, lastXHR,
     dataStore = {};
     dataStore.tracts = {};
     
