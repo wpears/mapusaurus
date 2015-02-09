@@ -489,7 +489,8 @@ if (!window.console) console = {log: function() {}};
        
       return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){  
         var points = makeDots(data.tracts.features).map(function(point){
-          return map.latLngToLayerPoint(point);
+          var latlng = new L.LatLng(point[1], point[0]);
+          return map.latLngToLayerPoint(latlng);
         });
         console.log(points);
         g.selectAll("circle")
