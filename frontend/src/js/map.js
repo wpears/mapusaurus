@@ -504,7 +504,7 @@ if (!window.console) console = {log: function() {}};
           var latlng = new L.LatLng(point[1], point[0]);
           return map.latLngToLayerPoint(latlng);
         });
-        console.log(points);
+
         g.selectAll("circle")
           .data(points)
           .enter()
@@ -519,68 +519,8 @@ if (!window.console) console = {log: function() {}};
       }
     }
     
-    function initVoronoi(){
-      map._initPathRoot();
-      var svg = d3.select("#map").select("svg");
-      var g = svg.append("g").attr("class", "leaflet-zoom-hide");
-      var voronoi = d3.geom.voronoi();
-
-      return function(collection){     
-        var positions = [];
-        var features = collection.features;
-        var size = map.getSize();
-
-        features.forEach(function(d) {        
-          var latlng = new L.LatLng(d.properties.centlat, d.properties.centlon);
-          var point =  map.latLngToLayerPoint(latlng);
-          positions.push([
-            point.x,
-            point.y
-          ]);
-        });
-
-
-        var polygons = voronoi(positions);
-        
-        window.poly = polygons;
-        window.feat = features;
-        var points = makeDots(polygons, features);
-         
-        /*
-         * Draw voronoi diagrams
-         * 
-        svg.selectAll(".voronoi").remove();
-        polygons.forEach(function(v) { v.cell = v; });
-        svg.selectAll("path")
-          .data(polygons)
-          .enter()
-          .append("svg:path")
-          .attr("class", "voronoi")
-          .attr({
-            "d": function(d) {
-              if(!d) return null; 
-              return "M" + d.cell.join("L") + "Z";
-            },
-            stroke:"black",
-            fill:"none"            
-          });
-        */
-
-         g.selectAll("circle")
-          .data(points)
-          .enter()
-          .append("circle")
-          .attr("class", "densityDot")
-          .attr({
-            "cx":function(d, i) { return d[0]; },
-            "cy":function(d, i) { return d[1]; },
-            "r":1,
-            fill:"#444"            
-           });
-      } 
-    }
     /*
-     * End Voronoi drawing
+     * End dot-density drawing
      */
 
     /* 
