@@ -14,7 +14,7 @@ if (!window.console) console = {log: function() {}};
             setMapHeight();
         });
 
-        updateVoronoi = initVoronoi(); 
+       //updateVoronoi = initVoronoi(); 
 
         // When minority changes, redraw the circles with appropriate styles
         $('#category-selector').on('change', function(e) {
@@ -122,11 +122,13 @@ if (!window.console) console = {log: function() {}};
             }
         });
          
-        map.on('moveend', _.debounce(init, 500) );
+        /*map.on('moveend', _.debounce(init, 500) );
 
         map.on('movestart', function(){
           d3.selectAll(".densityDot").remove();
         });
+       */
+        
 
         // When the page loads, update the print link, and update it whenever the hash changes
         updatePrintLink();
@@ -140,11 +142,12 @@ if (!window.console) console = {log: function() {}};
         });
          
         //Let the application do its thing 
-        init();
+       // init();
     });
     
     // Go get the tract centroids and supporting data, THEN build a data object (uses jQuery Deferreds)
     function init(){
+        return;
         blockStuff();
         $.when( getTractsInBounds( getBoundParams() ), getTractData( getBoundParams(), getActionTaken( $('#action-taken-selector option:selected').val() ))).done( function(data1, data2){
             // Get the information about the currently selected layer so we can pass bubble styles to redraw
@@ -477,11 +480,21 @@ if (!window.console) console = {log: function() {}};
       return inside;
     }
 
+    function initDotDensity(){
+      map._initPathRoot();
+      var svg = d3.select("#map").select("svg");
+      var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+       
+      return $.when($.ajax({url: "api/msa", data: {msa:41860}, traditional: true}),function(tracts){  
+        
+      });
+    }
+    
     function initVoronoi(){
       map._initPathRoot();
-      var svg = d3.select("#map").select("svg"),
-          g = svg.append("g").attr("class", "leaflet-zoom-hide"),
-          voronoi = d3.geom.voronoi();
+      var svg = d3.select("#map").select("svg");
+      var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+      var voronoi = d3.geom.voronoi();
 
       return function(collection){     
         var positions = [];
