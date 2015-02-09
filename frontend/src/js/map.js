@@ -447,9 +447,10 @@ if (!window.console) console = {log: function() {}};
   
     function makeDots(features){
       var points = []; 
+      //console.log(features,features.reduce(function(a,b){return a+b.properties.volume},0));
       for(var i=0; i<features.length; i++){
         var feat=features[i];
-        var poly = feat.geometry.coordinates;
+        var poly = feat.geometry.coordinates[0];
         var reverseBounds = L.latLngBounds(poly);
         if(!reverseBounds) continue;
         for(var j=0,len=feat.properties.volume; j<len; j++){
@@ -487,9 +488,20 @@ if (!window.console) console = {log: function() {}};
       var svg = d3.select("#map").select("svg");
       var g = svg.append("g").attr("class", "leaflet-zoom-hide");
        
-      return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true}),function(tracts){  
-        console.log(tracts);
-        makeDots(tracts.features); 
+      return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){  
+        var points = makeDots(data.tracts.features); 
+        //console.log(points);
+        g.selectAll("circle")
+          .data(points)
+          .enter()
+          .append("circle")
+          .attr("class", "densityDot")
+          .attr({
+            "cx":function(d, i) { return d[0]; },
+            "cy":function(d, i) { return d[1]; },
+            "r":1,
+            fill:"#444"            
+           });
       });
     }
     
