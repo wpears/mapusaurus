@@ -505,7 +505,7 @@ if (!window.console) console = {log: function() {}};
          
         /*
          * Draw voronoi diagrams
-         * 
+         */ 
         svg.selectAll(".voronoi").remove();
         polygons.forEach(function(v) { v.cell = v; });
         svg.selectAll("path")
@@ -521,7 +521,7 @@ if (!window.console) console = {log: function() {}};
             stroke:"black",
             fill:"none"            
           });
-        */
+        /**/
 
          g.selectAll("circle")
           .data(points)
