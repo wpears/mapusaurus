@@ -15,6 +15,7 @@ if (!window.console) console = {log: function() {}};
         });
 
        //updateVoronoi = initVoronoi(); 
+       initDotDensity();
 
         // When minority changes, redraw the circles with appropriate styles
         $('#category-selector').on('change', function(e) {
@@ -444,13 +445,14 @@ if (!window.console) console = {log: function() {}};
       return point;
     }
   
-    function makeDots(polygons,features){
+    function makeDots(features){
       var points = []; 
-      for(var i=0; i<polygons.length; i++){
-        var poly = polygons[i];
+      for(var i=0; i<features.length; i++){
+        var feat=features[i];
+        var poly = feat.geometry.coordinates;
         var reverseBounds = L.latLngBounds(poly);
         if(!reverseBounds) continue;
-        for(var j=0,len=features[i].properties.volume; j<len; j++){
+        for(var j=0,len=feat.properties.volume; j<len; j++){
           var pt = randomPoint(reverseBounds);
           var bail = 0;
           while(!pointInPoly(pt,poly)){
@@ -485,8 +487,9 @@ if (!window.console) console = {log: function() {}};
       var svg = d3.select("#map").select("svg");
       var g = svg.append("g").attr("class", "leaflet-zoom-hide");
        
-      return $.when($.ajax({url: "api/msa", data: {msa:41860}, traditional: true}),function(tracts){  
-        
+      return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true}),function(tracts){  
+        console.log(tracts);
+        makeDots(tracts.features); 
       });
     }
     
