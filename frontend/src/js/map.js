@@ -446,6 +446,7 @@ if (!window.console) console = {log: function() {}};
       for(var i=0; i<polygons.length; i++){
         var poly = polygons[i];
         var reverseBounds = L.latLngBounds(poly);
+        if(!reverseBounds) return;
         for(var j=0,len=features[i].properties.volume; j<len; j++){
           var pt = randomPoint(reverseBounds);
           var bail = 0;
