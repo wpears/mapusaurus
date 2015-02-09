@@ -143,7 +143,7 @@ if (!window.console) console = {log: function() {}};
         });
          
         //Let the application do its thing 
-       // init();
+        init();
     });
     
     // Go get the tract centroids and supporting data, THEN build a data object (uses jQuery Deferreds)
@@ -447,13 +447,12 @@ if (!window.console) console = {log: function() {}};
   
     function makeDots(features){
       var points = []; 
-      //console.log(features,features.reduce(function(a,b){return a+b.properties.volume},0));
       for(var i=0; i<features.length; i++){
         var feat=features[i];
         var poly = feat.geometry.coordinates[0];
         var reverseBounds = L.latLngBounds(poly);
         if(!reverseBounds) continue;
-        for(var j=0,len=feat.properties.volume; j<len; j++){
+        for(var j=0,len=feat.properties.volume/10>>0; j<len; j++){
           var pt = randomPoint(reverseBounds);
           var bail = 0;
           while(!pointInPoly(pt,poly)){
@@ -490,14 +489,14 @@ if (!window.console) console = {log: function() {}};
        
       return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){  
         var points = makeDots(data.tracts.features); 
-        //console.log(points);
+        console.log(points);
         g.selectAll("circle")
           .data(points)
           .enter()
           .append("circle")
           .attr("class", "densityDot")
           .attr({
-            "cx":function(d, i) { return d[0]; },
+            "cx":function(d, i) { return -d[0]; },
             "cy":function(d, i) { return d[1]; },
             "r":1,
             fill:"#444"            
