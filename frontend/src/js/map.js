@@ -1,7 +1,9 @@
 'use strict';
 
 if (!window.console) console = {log: function() {}};
-    var updateVoronoi;    
+    //var updateVoronoi;    
+    var updateDots;
+    var sfMSA;
     // When the DOM is loaded, check for params and add listeners:
     $(document).ready(function(){
         var lhStatus, peerStatus, branchStatus;
@@ -15,7 +17,18 @@ if (!window.console) console = {log: function() {}};
         });
 
        //updateVoronoi = initVoronoi(); 
-       initDotDensity();
+       updateDots = initDotDensity();
+       $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){
+         sfMSA = data;
+         updateDots(sfMSA);
+       });
+
+       map.on("zoomend",function(){updateDots(sfMSA);});
+
+       map.on('zoomstart', function(){
+          d3.selectAll(".densityDot").remove();
+        });
+
 
         // When minority changes, redraw the circles with appropriate styles
         $('#category-selector').on('change', function(e) {
@@ -486,8 +499,7 @@ if (!window.console) console = {log: function() {}};
       map._initPathRoot();
       var svg = d3.select("#map").select("svg");
       var g = svg.append("g").attr("class", "leaflet-zoom-hide");
-       
-      return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){  
+      return function(data){  
         var points = makeDots(data.tracts.features).map(function(point){
           var latlng = new L.LatLng(point[1], point[0]);
           return map.latLngToLayerPoint(latlng);
@@ -504,7 +516,7 @@ if (!window.console) console = {log: function() {}};
             "r":1,
             fill:"#444"            
            });
-      });
+      }
     }
     
     function initVoronoi(){
