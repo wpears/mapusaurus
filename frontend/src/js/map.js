@@ -488,7 +488,9 @@ if (!window.console) console = {log: function() {}};
       var g = svg.append("g").attr("class", "leaflet-zoom-hide");
        
       return $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){  
-        var points = makeDots(data.tracts.features); 
+        var points = makeDots(data.tracts.features).map(function(point){
+          return map.latLngToLayerPoint(point);
+        });
         console.log(points);
         g.selectAll("circle")
           .data(points)
@@ -496,8 +498,8 @@ if (!window.console) console = {log: function() {}};
           .append("circle")
           .attr("class", "densityDot")
           .attr({
-            "cx":function(d, i) { return -d[0]; },
-            "cy":function(d, i) { return d[1]; },
+            "cx":function(d, i) { return d.x; },
+            "cy":function(d, i) { return d.y; },
             "r":1,
             fill:"#444"            
            });
