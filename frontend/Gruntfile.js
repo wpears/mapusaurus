@@ -110,7 +110,7 @@ module.exports = function(grunt) {
         dest: 'frontend/dist/search/js/metro-search.min.js'
       },
       map: {
-        src: ['frontend/src/js/map.js'],
+        src: ['frontend/src/js/dotdensity.js','frontend/src/js/map.js'],
         dest: 'frontend/dist/map/js/map.min.js'
       },
       map_layout: {
