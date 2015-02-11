@@ -16,39 +16,39 @@ def loan_originations(request):
     lender_hierarchy = request.GET.get('lh')
     peers = request.GET.get('peers')
     geoids = get_censustract_geoids(request)
-    
     institution_selected = Institution.objects.get(pk=institution_id)
     metro_selected = Geo.objects.filter(geo_type=Geo.METRO_TYPE, geoid=metro).first()
     if action_taken_param:
-        action_taken_selected = action_taken_param.split(',')
+        action_taken_selected = [param for param in action_taken_param.split(',')]
     else:
-        action_taken_selected = None
+        action_taken_selected = []
     if geoids and action_taken_selected:
         query = HMDARecord.objects.filter(
                 property_type__in=[1,2], owner_occupancy=1, lien_status=1,
-                action_taken__in=action_taken_selected)
+                action_taken__in=action_taken_selected,
+                geo_id__in=geoids)
         if lender_hierarchy == 'true':
             hierarchy_list = LenderHierarchy.objects.filter(organization_id=institution_selected.lenderhierarchy_set.get().organization_id)
             if len(hierarchy_list) > 0:
-                query = query.filter(institution__in=hierarchy_list) 
+                query = query.filter(institution__in=[item.institution for item in hierarchy_list]) 
             else: 
-                query = query.filter(institution__in=institution_selected)
+                query = query.filter(institution=institution_selected)
         elif peers == 'true':
             peer_list = get_peer_list(institution_selected, metro_selected)
             if len(peer_list) > 0:
-                query = query.filter(institution__in=peer_list)
+                query = query.filter(institution__in=[item.institution for item in peer_list])
             else:
                 query = query.filter(institution=institution_selected)
         else: 
             query = query.filter(institution=institution_selected)
-        query = query.filter(geo__geoid__in=geoids)
     elif geoids:
         query = HMDARecord.objects.filter(
                 property_type__in=[1,2], owner_occupancy=1, lien_status=1,
-                geo__geoid__in=geoids)
+                geo__geoid__in=geoids,
+                institution=institution_selected)
     else: 
         return HttpResponseBadRequest("Missing geoid.")
-    query = query.values('geo__geoid', 'geo__census2010households__total').annotate(volume=Count('geo__geoid'))
+    query = query.values('geo_id', 'geo__census2010households__total').annotate(volume=Count('geo_id'))
     return query; 
     
 def get_peer_list(lender, metro):
@@ -64,7 +64,7 @@ def loan_originations_as_json(request):
     records = loan_originations(request)
     data = {}
     for row in records:
-        data[row['geo__geoid']] = {
+        data[row['geo_id']] = {
             'volume': row['volume'],
             'num_households': row['geo__census2010households__total'],
         }
