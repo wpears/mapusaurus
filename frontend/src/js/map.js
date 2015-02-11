@@ -15,7 +15,7 @@ if (!window.console) console = {log: function() {}};
         
         dotDensity.init();
 
-        map.on("zoomend", dotDensity.draw);
+        map.on("viewreset", dotDensity.draw);
 
         map.on('zoomstart', dotDensity.wipe); 
           
@@ -286,9 +286,6 @@ if (!window.console) console = {log: function() {}};
     
     // Get the census tracts that are in bounds for the current map view. Return a promise.
     function getTractsInBounds( bounds ){
-
-        $('#bubbles_loading').show();
-
         // Create the appropriate URL path to return values
         var endpoint = '/api/tractCentroids/', 
             params = { neLat: bounds.neLat,
@@ -307,7 +304,6 @@ if (!window.console) console = {log: function() {}};
     // Get minority and LAR data for census Tracts within the bounding box, for a specific criteria (actionTaken)
     // Return a promise.
     function getTractData( bounds, actionTakenVal ){
-        $('#bubbles_loading').show();
         var endpoint = '/api/all/',
             params = { year: 2013,
                         'lh': false,

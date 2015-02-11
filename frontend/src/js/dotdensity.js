@@ -16,6 +16,9 @@ var dotDensity =  function(){
     });
   }
 
+  function getMSAs (){
+  
+  }
 
   function draw(){  
     var data = sfMSA;
@@ -95,7 +98,7 @@ var dotDensity =  function(){
 
   return {
     init:init,
-    draw:draw,
+    update:update,
     wipe:wipe
   }
 }();
