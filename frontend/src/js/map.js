@@ -15,7 +15,9 @@ if (!window.console) console = {log: function() {}};
         
         dotDensity.init();
 
-        map.on("viewreset", dotDensity.draw);
+        map.on("viewreset", function(){
+          dotDensity.update(getBoundParams());
+        });
 
         map.on('zoomstart', dotDensity.wipe); 
           
@@ -286,6 +288,7 @@ if (!window.console) console = {log: function() {}};
     
     // Get the census tracts that are in bounds for the current map view. Return a promise.
     function getTractsInBounds( bounds ){
+
         // Create the appropriate URL path to return values
         var endpoint = '/api/tractCentroids/', 
             params = { neLat: bounds.neLat,

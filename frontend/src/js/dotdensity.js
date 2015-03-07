@@ -3,21 +3,32 @@ var dotDensity =  function(){
   
   var svg;
   var g;
-  var sfMSA;
 
 
   function init(){
     map._initPathRoot();
     svg = d3.select("#map").select("svg");
     g = svg.append("g").attr("class", "leaflet-zoom-hide");
-    $.when($.ajax({url: "/api/msa", data: {metro:41860}, traditional: true})).done(function(data){
-      sfMSA = data;
-      draw();
-    });
   }
 
-  function getMSAs (){
-  
+  function getMSAs(bounds){
+   var endpoint = '/api/msas/';
+            var params = { neLat: bounds.neLat,
+                       neLon: bounds.neLon,
+                       swLat: bounds.swLat,
+                       swLon: bounds.swLon };
+        return $.ajax({url: endpoint, data: params, traditional: true})
+          .then(function(data){
+            diffMSAs(data);
+          }) 
+  }
+
+  function diffMSAs(data){
+    console.log('diffing',data);
+  }
+
+  function update(bounds){
+    getMSAs(bounds);
   }
 
   function draw(){  
